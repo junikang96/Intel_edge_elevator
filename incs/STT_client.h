@@ -52,7 +52,7 @@ void handle_stt_result(const char *text);
 
 size_t WriteCallback(void *ptr, size_t size, size_t nmemb, void *userp);
 char *encode_binary_base64(const void *data, size_t size);
-
+char* extract_transcript_from_json(const char *json_str, void (*callback)(const char *));
 void *thread_STT(void *arg);
 
 void *audio_capture_thread(void *arg);
