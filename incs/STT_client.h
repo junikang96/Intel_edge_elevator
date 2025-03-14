@@ -43,6 +43,9 @@ extern int server_socket;
 extern int is_connected;
 extern volatile int recording_flag;
 
+void play_tts(const char *text);
+void *server_response_thread(void *arg);
+
 int connect_to_server();
 void disconnect_from_server();
 int send_text_to_server(const char *text);
@@ -53,7 +56,7 @@ void handle_stt_result(const char *text);
 size_t WriteCallback(void *ptr, size_t size, size_t nmemb, void *userp);
 char *encode_binary_base64(const void *data, size_t size);
 char* extract_transcript_from_json(const char *json_str, void (*callback)(const char *));
-void *thread_STT(void *arg);
+void *STT_thread(void *arg);
 
 void *audio_capture_thread(void *arg);
 pthread_t start_realtime_stt(void (*callback)(const char *));

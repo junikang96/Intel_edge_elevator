@@ -29,14 +29,14 @@ char* extract_transcript_from_json(const char *json_str, void (*callback)(const 
     // JSON 파싱
     json = cJSON_Parse(json_str);
     if (!json) {
-        printf("JSON 파싱 오류: %s\n", json_str);
+        printf("JSON phasing error: %s\n", json_str);
         return empty_result;
     }
     
     // results 배열 가져오기
     cJSON *results = cJSON_GetObjectItem(json, "results");
     if (!results || !cJSON_IsArray(results) || cJSON_GetArraySize(results) == 0) {
-        printf("인식된 텍스트 없음\n");
+        printf("No recognized test.\n");
         cJSON_Delete(json);
         return empty_result;
     }
@@ -70,7 +70,7 @@ char* extract_transcript_from_json(const char *json_str, void (*callback)(const 
     }
     
     // 결과 출력 및 콜백 호출
-    printf("인식된 텍스트: %s\n", transcript->valuestring);
+    printf("Recognized text: %s\n", transcript->valuestring);
     fflush(stdout);
     
     if (callback) {
@@ -87,7 +87,7 @@ char* extract_transcript_from_json(const char *json_str, void (*callback)(const 
 }
 
 // STT 처리를 위한 스레드
-void *thread_STT(void *arg) {
+void *STT_thread(void *arg) {
     struct STTThreadArg *thread_arg = (struct STTThreadArg *)arg;
     CURL *curl;
     CURLcode res;
@@ -96,7 +96,7 @@ void *thread_STT(void *arg) {
     // 오디오 데이터를 Base64로 변환
     char *audio_base64 = encode_binary_base64(thread_arg->audio_data, thread_arg->audio_size);
     if (!audio_base64) {
-        printf("오디오 데이터를 Base64로 인코딩할 수 없습니다.\n");
+        printf("Base64 encoding failed.\n");
         free(thread_arg->audio_data);
         free(thread_arg);
         pthread_exit(NULL);

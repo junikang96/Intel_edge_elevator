@@ -9,7 +9,7 @@ void *audio_capture_thread(void *arg) {
 
     // ALSA 초기화
     if ((err = snd_pcm_open(&capture_handle, "default", SND_PCM_STREAM_CAPTURE, 0)) < 0) {
-        fprintf(stderr, "오디오 장치를 열 수 없습니다: %s\n", snd_strerror(err));
+        fprintf(stderr, "Cannot open audio device: %s\n", snd_strerror(err));
         pthread_exit(NULL);
     }
 
@@ -21,12 +21,12 @@ void *audio_capture_thread(void *arg) {
     snd_pcm_hw_params_set_rate_near(capture_handle, hw_params, &(unsigned int){SAMPLE_RATE}, 0);
     snd_pcm_hw_params(capture_handle, hw_params);
 
-    printf("실시간 음성 인식이 시작되었습니다. (Ctrl+C로 종료)\n");
+    printf("Voice recognition has begun.\n");
 
     // 오디오 버퍼 할당
     void *buffer = malloc(BUFFER_SIZE);
     if (!buffer) {
-        fprintf(stderr, "메모리 할당 실패\n");
+        fprintf(stderr, "Memory allocation failed\n");
         snd_pcm_close(capture_handle);
         pthread_exit(NULL);
     }
@@ -36,7 +36,7 @@ void *audio_capture_thread(void *arg) {
         int frames_read = snd_pcm_readi(capture_handle, buffer, FRAMES_PER_CHUNK);
         
         if (frames_read < 0) {
-            fprintf(stderr, "오디오 읽기 오류: %s\n", snd_strerror(frames_read));
+            fprintf(stderr, "Error Reading Audio: %s\n", snd_strerror(frames_read));
             snd_pcm_recover(capture_handle, frames_read, 0);
             continue;
         }
@@ -67,8 +67,8 @@ void *audio_capture_thread(void *arg) {
                         arg->audio_size = data_size;
                         arg->callback = callback;
                         
-                        if (pthread_create(&stt_thread, NULL, thread_STT, arg) != 0) {
-                            fprintf(stderr, "STT 스레드 생성 실패\n");
+                        if (pthread_create(&stt_thread, NULL, STT_thread, arg) != 0) {
+                            fprintf(stderr, "Failed to create STT Thread.\n");
                             free(arg->audio_data);
                             free(arg);
                         } else {
@@ -79,7 +79,7 @@ void *audio_capture_thread(void *arg) {
                     }
                 }
             } else {
-                printf("무음 감지됨, STT 처리 생략\n");
+                printf("Skip STT processing due to silence.\n");
             }
         }
     }
@@ -92,7 +92,7 @@ void *audio_capture_thread(void *arg) {
 // 시그널 핸들러 - Ctrl+C로 녹음 중지
 void handle_signal(int sig) {
     recording_flag = 0;
-    printf("\n녹음을 중지합니다...\n");
+    printf("\nStop recording...\n");
 }
 
 // 실시간 음성 인식 시작
@@ -104,7 +104,7 @@ pthread_t start_realtime_stt(void (*callback)(const char *)) {
     
     // 오디오 캡처 스레드 시작
     if (pthread_create(&thread_id, NULL, audio_capture_thread, (void *)callback) != 0) {
-        fprintf(stderr, "스레드 생성 실패\n");
+        fprintf(stderr, "Creating thread failed.\n");
         return 0;
     }
     
