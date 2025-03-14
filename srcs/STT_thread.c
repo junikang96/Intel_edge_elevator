@@ -21,6 +21,71 @@ char *encode_binary_base64(const void *data, size_t size) {
     return encoded;
 }
 
+// JSON 응답에서 텍스트 추출
+char* extract_transcript_from_json(const char *json_str, void (*callback)(const char *)) {
+    static char empty_result[] = "";
+    cJSON *json = NULL;
+    
+    // JSON 파싱
+    json = cJSON_Parse(json_str);
+    if (!json) {
+        printf("JSON 파싱 오류: %s\n", json_str);
+        return empty_result;
+    }
+    
+    // results 배열 가져오기
+    cJSON *results = cJSON_GetObjectItem(json, "results");
+    if (!results || !cJSON_IsArray(results) || cJSON_GetArraySize(results) == 0) {
+        printf("인식된 텍스트 없음\n");
+        cJSON_Delete(json);
+        return empty_result;
+    }
+    
+    // 첫 번째 결과 가져오기
+    cJSON *first_result = cJSON_GetArrayItem(results, 0);
+    if (!first_result) {
+        cJSON_Delete(json);
+        return empty_result;
+    }
+    
+    // alternatives 배열 가져오기
+    cJSON *alternatives = cJSON_GetObjectItem(first_result, "alternatives");
+    if (!alternatives || !cJSON_IsArray(alternatives) || cJSON_GetArraySize(alternatives) == 0) {
+        cJSON_Delete(json);
+        return empty_result;
+    }
+    
+    // 첫 번째 대안 가져오기
+    cJSON *first_alt = cJSON_GetArrayItem(alternatives, 0);
+    if (!first_alt) {
+        cJSON_Delete(json);
+        return empty_result;
+    }
+    
+    // transcript 가져오기
+    cJSON *transcript = cJSON_GetObjectItem(first_alt, "transcript");
+    if (!transcript || !cJSON_IsString(transcript) || !transcript->valuestring) {
+        cJSON_Delete(json);
+        return empty_result;
+    }
+    
+    // 결과 출력 및 콜백 호출
+    printf("인식된 텍스트: %s\n", transcript->valuestring);
+    fflush(stdout);
+    
+    if (callback) {
+        callback(transcript->valuestring);
+    }
+    
+    // 임시 버퍼에 결과 복사
+    static char result_buffer[4096];
+    strncpy(result_buffer, transcript->valuestring, sizeof(result_buffer) - 1);
+    result_buffer[sizeof(result_buffer) - 1] = '\0';
+    
+    cJSON_Delete(json);
+    return result_buffer;
+}
+
 // STT 처리를 위한 스레드
 void *thread_STT(void *arg) {
     struct STTThreadArg *thread_arg = (struct STTThreadArg *)arg;
@@ -92,38 +157,9 @@ void *thread_STT(void *arg) {
         pthread_exit(NULL);
     }
 
-    // JSON 응답 파싱
+    // JSON 응답 파싱 및 텍스트 추출
     if (response.data) {
-        cJSON *json = cJSON_Parse(response.data);
-        if (json) {
-            cJSON *results = cJSON_GetObjectItem(json, "results");
-            if (cJSON_IsArray(results) && cJSON_GetArraySize(results) > 0) {
-                cJSON *first_result = cJSON_GetArrayItem(results, 0);
-                if (first_result) {
-                    cJSON *alternatives = cJSON_GetObjectItem(first_result, "alternatives");
-                    if (cJSON_IsArray(alternatives) && cJSON_GetArraySize(alternatives) > 0) {
-                        cJSON *first_alt = cJSON_GetArrayItem(alternatives, 0);
-                        if (first_alt) {
-                            cJSON *transcript = cJSON_GetObjectItem(first_alt, "transcript");
-                            if (cJSON_IsString(transcript) && transcript->valuestring != NULL) {
-                                printf("인식된 텍스트: %s\n", transcript->valuestring);
-                                fflush(stdout);
-                                
-                                // 콜백 함수가 있으면 결과 전달
-                                if (thread_arg->callback) {
-                                    thread_arg->callback(transcript->valuestring);
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-                printf("인식된 텍스트 없음\n");
-            }
-            cJSON_Delete(json);
-        } else {
-            printf("JSON 파싱 오류: %s\n", response.data);
-        }
+        extract_transcript_from_json(response.data, thread_arg->callback);
         free(response.data);
     }
 

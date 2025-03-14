@@ -54,22 +54,18 @@ void disconnect_from_server() {
     }
 }
 
-// 인식된 텍스트를 서버로 전송
 int send_text_to_server(const char *text) {
     char buffer[1024];
     int socket_fd;
     
-    // 서버에 연결 확인
     socket_fd = connect_to_server();
     if (socket_fd < 0) {
         fprintf(stderr, "서버 연결 실패, 텍스트 전송 불가\n");
         return -1;
     }
     
-    // 텍스트 버퍼 준비
     snprintf(buffer, sizeof(buffer), "%s", text);
     
-    // 서버로 전송
     if (send(socket_fd, buffer, strlen(buffer), 0) < 0) {
         perror("텍스트 전송 실패");
         return -1;

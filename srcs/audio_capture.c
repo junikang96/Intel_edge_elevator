@@ -55,12 +55,10 @@ void *audio_capture_thread(void *arg) {
             }
             
             if (!silent) {
-                // STT 처리를 위한 스레드 시작
                 pthread_t stt_thread;
                 struct STTThreadArg *arg = (struct STTThreadArg *)malloc(sizeof(struct STTThreadArg));
                 
                 if (arg) {
-                    // 오디오 데이터 복사
                     size_t data_size = frames_read * CHANNELS * BYTES_PER_SAMPLE;
                     arg->audio_data = malloc(data_size);
                     
@@ -74,7 +72,6 @@ void *audio_capture_thread(void *arg) {
                             free(arg->audio_data);
                             free(arg);
                         } else {
-                            // 스레드를 분리하여 자동으로 리소스가 정리되도록 함
                             pthread_detach(stt_thread);
                         }
                     } else {
