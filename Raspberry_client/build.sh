@@ -1,0 +1,1 @@
+gcc -o STT_client STT_client.c -lcurl -lcjson -lglib-2.0 -lpthread -lasound `pkg-config --cflags --libs glib-2.0`
