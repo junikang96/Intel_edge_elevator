@@ -16,7 +16,7 @@
 #include <netdb.h>
 
 #define GOOGLE_STT_API "https://speech.googleapis.com/v1/speech:recognize?key=AIzaSyDAPXSoj4TgR6HhaOHK9Kvbl0ahNTmCh2Q"
-#define AUDIO_PATH "/home/ubuntu/Final_Project/Raspberry_client/voices"
+#define AUDIO_PATH "/home/pi/Final_Project/Raspberry_client_test/voices"
 
 #define SAMPLE_RATE 16000
 #define CHANNELS 1
@@ -27,7 +27,7 @@
 #define BUFFER_SIZE (FRAMES_PER_CHUNK * CHANNELS * BYTES_PER_SAMPLE)
 
 #define SERVER_IP "127.0.0.1"  
-#define SERVER_PORT 5000      
+#define SERVER_PORT 5000
 
 struct ResponseBuffer {
     char *data;

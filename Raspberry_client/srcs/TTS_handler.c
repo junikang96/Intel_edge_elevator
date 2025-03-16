@@ -47,7 +47,7 @@ void play_tts(const char *text) {
         return;
     }
     
-    snprintf(command, sizeof(command), "mpg123 /home/pi/Final_Project/Raspberry_client_test/voices/%s", filename);
+    snprintf(command, sizeof(command), "mpg123 %s/%s", AUDIO_PATH, filename);
     system(command);
     printf("오디오 재생: %s\n", filename);
 }
