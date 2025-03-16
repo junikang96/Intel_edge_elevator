@@ -12,7 +12,6 @@ int main() {
         return 1;
     }
 
-    // 서버 응답 수신 스레드 시작
     pthread_t response_thread;
     if (pthread_create(&response_thread, NULL, server_response_thread, NULL) != 0) {
         fprintf(stderr, "서버 응답 스레드 생성 실패\n");
