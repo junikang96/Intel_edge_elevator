@@ -14,7 +14,7 @@ int main() {
 
     pthread_t response_thread;
     if (pthread_create(&response_thread, NULL, server_response_thread, NULL) != 0) {
-        fprintf(stderr, "서버 응답 스레드 생성 실패\n");
+        fprintf(stderr, "Creating server response thread failed.\n");
         disconnect_from_server();
         curl_global_cleanup();
         return 1;

@@ -26,7 +26,7 @@
 #define BYTES_PER_SAMPLE 2  // 16비트 오디오
 #define BUFFER_SIZE (FRAMES_PER_CHUNK * CHANNELS * BYTES_PER_SAMPLE)
 
-#define SERVER_IP "127.0.0.1"  
+#define SERVER_IP "10.10.141.31"  
 #define SERVER_PORT 5000
 
 struct ResponseBuffer {

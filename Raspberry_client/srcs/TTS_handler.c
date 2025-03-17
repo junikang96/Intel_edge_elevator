@@ -9,13 +9,13 @@ void *server_response_thread(void *arg) {
         bytes_received = recv(server_socket, buffer, sizeof(buffer) - 1, 0);
         
         if (bytes_received <= 0) {
-            printf("서버 연결이 끊겼습니다.\n");
+            printf("Server disconnected.\n");
             is_connected = 0;
             break;
         }
         
         buffer[bytes_received] = '\0';
-        printf("서버로부터 응답 수신: %s\n", buffer);
+        printf("Response from server: %s\n", buffer);
         
         if (strncmp(buffer, "TTS:", 4) == 0) {
             char *tts_text = buffer + 4;  
@@ -43,11 +43,11 @@ void play_tts(const char *text) {
         strcpy(filename, "door_close_FEMALE.mp3");
     }
     else {
-        printf("해당 음성 파일이 없습니다: %s\n", text);
+        printf("No audio files: %s\n", text);
         return;
     }
     
     snprintf(command, sizeof(command), "mpg123 %s/%s", AUDIO_PATH, filename);
     system(command);
-    printf("오디오 재생: %s\n", filename);
+    printf("Audio Playing: %s\n", filename);
 }
