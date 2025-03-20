@@ -19,7 +19,7 @@ SOURCES = $(SRC_DIR)/audio_capture.c \
 OBJECTS = $(SOURCES:.c=.o)
 
 # 실행 파일 이름
-TARGET = STT_client_test
+TARGET = Raspberry_client
 
 # 기본 타겟
 all: $(TARGET)
