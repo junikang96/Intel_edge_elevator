@@ -16,7 +16,7 @@
 #include <netdb.h>
 
 #define GOOGLE_STT_API "https://speech.googleapis.com/v1/speech:recognize?key=AIzaSyDAPXSoj4TgR6HhaOHK9Kvbl0ahNTmCh2Q"
-#define AUDIO_PATH "/home/pi/Final_Project/Raspberry_client_test/voices"
+#define AUDIO_PATH "/home/pi/Final_Project/carelift/Raspberry_client/voices"
 
 #define SAMPLE_RATE 16000
 #define CHANNELS 1
@@ -26,7 +26,7 @@
 #define BYTES_PER_SAMPLE 2  // 16비트 오디오
 #define BUFFER_SIZE (FRAMES_PER_CHUNK * CHANNELS * BYTES_PER_SAMPLE)
 
-#define SERVER_IP "10.10.141.42"  
+#define SERVER_IP "10.10.141.72"  
 #define SERVER_PORT 5000
 
 struct ResponseBuffer {
@@ -40,17 +40,17 @@ struct STTThreadArg {
     void (*callback)(const char *text);  
 };
 
-extern int server_socket;
+
 extern int is_connected;
 extern volatile int recording_flag;
 
 int connect_to_server();
-void disconnect_from_server();
+void disconnect_from_server(int server_socket);
 int send_text_to_server(const char *text);
 
 void *audio_capture_thread(void *arg);
 void handle_signal(int sig);
-pthread_t start_realtime_stt(void (*callback)(const char *));
+pthread_t start_realtime_stt(void (*callback)(const char *), int socket_fd);
 
 size_t WriteCallback(void *ptr, size_t size, size_t nmemb, void *userp);
 char *encode_binary_base64(const void *data, size_t size);
@@ -61,3 +61,5 @@ void handle_stt_result(const char *text);
 
 void *server_response_thread(void *arg);
 void play_tts(const char *text);
+
+void set_socket_fd(int fd);

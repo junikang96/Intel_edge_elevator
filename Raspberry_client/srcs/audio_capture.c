@@ -90,7 +90,7 @@ void handle_signal(int sig) {
     printf("\nStop recording...\n");
 }
 
-pthread_t start_realtime_stt(void (*callback)(const char *)) {
+pthread_t start_realtime_stt(void (*callback)(const char *), int socket_fd) {
     pthread_t thread_id;
     
     // Ctrl+C 시그널 핸들러 등록

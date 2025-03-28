@@ -1,12 +1,14 @@
 #include "../incs/define.h"
 
-void *server_response_thread(void *arg) {
+void *server_response_thread(void *arg) 
+{
     char buffer[1024];
     int bytes_received;
-    
+    int *serverfd = (int *)arg;
+
     while (is_connected) {
         memset(buffer, 0, sizeof(buffer));
-        bytes_received = recv(server_socket, buffer, sizeof(buffer) - 1, 0);
+        bytes_received = recv(*serverfd, buffer, sizeof(buffer) - 1, 0);
         
         if (bytes_received <= 0) {
             printf("Server disconnected.\n");
@@ -30,17 +32,20 @@ void play_tts(const char *text) {
     char command[1024];
     char filename[256];
     
-    if (strcmp(text, "floor1") == 0) {
-        strcpy(filename, "floor1_FEMALE.mp3");
-    } 
-    else if (strcmp(text, "floor2") == 0) {
-        strcpy(filename, "floor2_FEMALE.mp3");
+    if (strcmp(text, "elevator_start") == 0) {
+        strcpy(filename, "elevator_start.mp3");
     }
     else if (strcmp(text, "door_open") == 0) {
         strcpy(filename, "door_open_FEMALE.mp3");
     }
     else if (strcmp(text, "door_close") == 0) {
         strcpy(filename, "door_close_FEMALE.mp3");
+    }   
+    else if (strcmp(text, "elevator_end") == 0) {
+        strcpy(filename, "elevator_end.mp3");
+    }
+    else if (strcmp(text, "wheelchair") == 0) {
+        strcpy(filename, "wheelchair_FEMALE.mp3");
     }
     else {
         printf("No audio files: %s\n", text);

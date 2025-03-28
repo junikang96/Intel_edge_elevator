@@ -1,7 +1,16 @@
 #include "../incs/define.h"
 
+int socket_fd = 0;
+
+void set_socket_fd(int fd)
+{
+    socket_fd = fd;
+    printf("fd is %d\n", fd);
+}
+
 int connect_to_server() {
     struct sockaddr_in server_addr;
+    int server_socket = 0;
     
     if (is_connected && server_socket >= 0) {
         return server_socket;
@@ -45,7 +54,7 @@ int connect_to_server() {
     return server_socket;
 }
 
-void disconnect_from_server() {
+void disconnect_from_server(int server_socket) {
     if (server_socket >= 0) {
         close(server_socket);
         server_socket = -1;
@@ -56,15 +65,16 @@ void disconnect_from_server() {
 
 int send_text_to_server(const char *text) {
     char buffer[1024];
-    int socket_fd;
+    // int socket_fd;
     
-    socket_fd = connect_to_server();
-    if (socket_fd < 0) {
-        fprintf(stderr, "Server connection failed, sending text failed.\n");
-        return -1;
-    }
+    // socket_fd = connect_to_server();
+    // if (socket_fd < 0) {
+    //     fprintf(stderr, "Server connection failed, sending text failed.\n");
+    //     return -1;
+    // }
     
-    snprintf(buffer, sizeof(buffer), "%s", text);
+    printf("this is serverFD:%d\n", socket_fd);
+    snprintf(buffer, sizeof(buffer), "%s", "BUTTON_PRESSED");
     
     if (send(socket_fd, buffer, strlen(buffer), 0) < 0) {
         perror("Sending Text failed");
